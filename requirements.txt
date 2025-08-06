@@ -1,0 +1,23 @@
+--- Core Application & Frameworks ---
+streamlit
+fastapi
+langchain==0.1.20
+langchain-google-genai==1.0.5
+
+--- Document Loaders & Processing ---
+pypdf
+unstructured
+python-docx
+
+--- Vector Database ---
+chromadb
+
+--- API & Server Utilities ---
+requests
+python-dotenv
+
+--- Production Server (for deployment on Render, etc.) ---
+gunicorn
+
+--- Development Server (for running locally) ---
+uvicorn

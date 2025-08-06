@@ -1,0 +1,19 @@
+# Environment variables
+.env
+
+# Virtual Environment
+venv/
+/venv/
+
+# Local Database
+chroma_db/
+/chroma_db/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# VS Code settings
+.vscode/
