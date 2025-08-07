@@ -11,15 +11,21 @@ from langchain_community.vectorstores import Chroma
 def download_file_from_url(url: str) -> str | None:
     """
     Downloads a file from a URL to a temporary local path.
-    This is needed because the API receives a URL, not a file.
+    Includes a User-Agent header to mimic a browser request.
     """
-    try:
-        # Use a timeout to prevent the request from hanging indefinitely
-        response = requests.get(url, timeout=30)
-        # Raise an HTTPError for bad responses (4xx or 5xx)
-        response.raise_for_status()
+    # --- THIS IS THE FIX ---
+    # Some servers block requests that don't look like they're from a browser.
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    # -----------------------
 
-        # Create a temporary file, ensuring it has the correct file extension
+    try:
+        # Use a timeout and the new headers
+        response = requests.get(url, headers=headers, timeout=30)
+        response.raise_for_status() # Raise an HTTPError for bad responses
+
+        # Create a temporary file with the correct extension
         suffix = Path(url).suffix
         with NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
             tmp_file.write(response.content)
