@@ -25,19 +25,22 @@ def download_file_from_url(url: str) -> str | None:
         }
         
         # Use a timeout to prevent the request from hanging indefinitely.
-        response = requests.get(url, headers=headers, timeout=60)
-        
-        # Raise an exception if the download failed (e.g., 404 Not Found, 403 Forbidden).
-        response.raise_for_status()
+        # Using stream=True is more memory-efficient for large files.
+        with requests.get(url, headers=headers, timeout=60, stream=True) as response:
+            # Raise an exception if the download failed (e.g., 404 Not Found, 403 Forbidden).
+            response.raise_for_status()
 
-        # Create a temporary file to store the downloaded content.
-        # The 'suffix' ensures the file has the correct extension (e.g., .pdf).
-        suffix = Path(url).suffix
-        with NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
-            tmp_file.write(response.content)
-            temp_file_path = tmp_file.name
-            print(f"File downloaded successfully to temporary path: {temp_file_path}")
-            return temp_file_path
+            # Create a temporary file to store the downloaded content.
+            # The 'suffix' ensures the file has the correct extension (e.g., .pdf).
+            suffix = Path(url).suffix
+            with NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
+                # Write the file to disk in chunks to save memory
+                for chunk in response.iter_content(chunk_size=8192):
+                    tmp_file.write(chunk)
+                
+                temp_file_path = tmp_file.name
+                print(f"File downloaded successfully to temporary path: {temp_file_path}")
+                return temp_file_path
 
     except requests.exceptions.RequestException as e:
         # This will catch any network-related errors during download.
